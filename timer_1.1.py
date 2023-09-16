@@ -12,10 +12,10 @@
 # [4] - clarification                                  #
 #                                                      #
 ########################################################
-
+import time
+import datetime
 from os import path, remove, walk
 from sys import exit as sys_exit
-from time import sleep
 
 import customtkinter as CTKi
 from playsound import playsound
@@ -25,6 +25,18 @@ from num2words import num2words
 
 from TimTK import TimerTK
 import constant as c
+
+class MySleep:
+    def __init__(self, sec):
+        self.__zero_time__ = time.time()
+        self.__sec__ = sec
+        self.__seconds_passed__ = sec
+
+    def end_of_cycle(self):
+        if  self.__zero_time__ + self.__seconds_passed__ <= time.time():
+            self.__seconds_passed__ += self.__sec__
+            return True
+        return False
 
 root = CTKi.CTk()
 
@@ -78,7 +90,6 @@ def speach(sec_time_total_left):
         remove(c.SPEECH_FILE)
     s.save(c.SPEECH_FILE )
     Thread( target=playsound, args=(c.SPEECH_FILE,), daemon=True ).start()
-
 #
 #   The actual operation of the timer
 def timer_operation():
@@ -94,12 +105,14 @@ def timer_operation():
                                               text_color='SpringGreen3' )
     root.update()
     sec_time_total_left = sec_time_total
+    my_sleep = MySleep( sec=1 )
     for _ in range(int_number_of_stage):
         sec_time_stage_left = sec_time_stage
         for _ in range(sec_time_stage):
             if timer_tk.signal_end_of_programm:
                 sys_exit()
-            sleep(1)
+            while (not my_sleep.end_of_cycle()):
+                time.sleep( 0.001 )
             sec_time_total_left -= 1
             sec_time_stage_left -= 1
             timer_tk.label_time_total_left.configure(
