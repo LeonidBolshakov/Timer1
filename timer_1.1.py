@@ -60,7 +60,7 @@ def create_list_melodies():
 
 
 def time_to_speach(tm, min_sec):
-    unit_of_measure = {0: (' минут',  ' секунд'),
+    unit_of_measure = {0: (' минут', ' секунд'),
                        1: (' минута', ' секунда'),
                        2: (' минуты', ' секунды')}
 
@@ -99,16 +99,38 @@ def speach(sec_time_total_left):
 
 #
 #   The actual operation of the timer
+
+
+def label_format_standard(label, text):
+    for l in label:
+        l.configure(text=timer_tk.sec_to_str(text), text_color='SpringGreen3', font=('Arial Black', 18))
+    return l.cget("fg_color")
+
+
+def label_format_attention(label, color):
+    for l in label:
+        l.configure(fg_color=color)
+
+
 def timer_operation():
+    list_label = [timer_tk.label_time_stage_left, timer_tk.label_time_total_left]
     timer_tk.button_start.configure(state=ctki.DISABLED, fg_color=c.DISABLE_COLOR)
     int_number_of_stage = timer_tk.create_int_number_of_stage()
+
     sec_time_total = timer_tk.create_sec_time_stage() * int_number_of_stage
     sec_time_stage = timer_tk.create_sec_time_stage()
 
-    timer_tk.label_time_stage_left.configure(text=timer_tk.sec_to_str(sec_time_stage),
-                                             text_color='SpringGreen3', font=('Arial Black', 18))
-    timer_tk.label_time_total_left.configure(text=timer_tk.sec_to_str(sec_time_total),
-                                             text_color='SpringGreen3', font=('Arial Black', 18))
+    fg_color = label_format_standard(
+        list_label, sec_time_total)
+
+    label_format_attention(
+        list_label, 'red')
+
+    root.update()
+    time.sleep(0.05)
+    label_format_attention(
+        list_label, fg_color)
+
     root.update()
     sec_time_total_left = sec_time_total
     my_sleep = MySleep(sec=1)
